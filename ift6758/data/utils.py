@@ -18,11 +18,11 @@ def clean_raw_data(dataframe: pd.DataFrame) -> pd.DataFrame:
     
     # key player_id, value name
     player_names = {
-
+        row["playerId"]: " ".join([row["firstName"]["default"],row["lastName"]["default"]]) for row in dataframe["rosterSpots"]
     }
     data = []
     for row in dataframe["plays"]:
-        if row[EVENT_KEY] in EVENTS:
+        if row[EVENT_KEY] == "goal":
             data.append(
                 row["periodDescriptor"]["number"],
                 row["timeInPeriod"],
@@ -30,6 +30,25 @@ def clean_raw_data(dataframe: pd.DataFrame) -> pd.DataFrame:
                 row[EVENT_KEY],
                 row["details"]["xCoord"],
                 row["details"]["yCoord"],
+                row["details"]["shotType"],
+                row["situationCode"],
+                player_names[row["details"]["scoringPlayerId"]],
+                player_names.get(row["details"]["goalieInNetId"],None)
+
+            )
+        elif row[EVENT_KEY] == "shot-on-goal":
+            data.append(
+                row["periodDescriptor"]["number"],
+                row["timeInPeriod"],
+                team_names[row["details"]["eventOwnerTeamId"]],
+                row[EVENT_KEY],
+                row["details"]["xCoord"],
+                row["details"]["yCoord"],
+                row["details"]["shotType"],
+                row["situationCode"],
+                player_names[row["details"]["shootingPlayerId"]],
+                player_names.get(row["details"]["goalieInNetId"],None)
+
             )
 
     return pd.DataFrame(data=data)
