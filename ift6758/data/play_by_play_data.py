@@ -88,7 +88,7 @@ class PlayByPlayData:
         :param other: Other PlayByPlayData instance
         :return: Combined DataFrame
         """
-        if isinstance(other, HockeyData):
+        if isinstance(other, PlayByPlayData):
             combined_data = pd.concat([self.get_all_data(), other.get_all_data()], ignore_index=True)
             return combined_data
         raise ValueError("Object's type need to be PlayByPlayData.")
