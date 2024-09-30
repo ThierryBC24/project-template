@@ -1,10 +1,14 @@
 import pandas as pd
 import requests
 
+from  play_by_play_data import PlayByPlayData
+
 EVENTS = ["goal","shot-on-goal"]
 EVENT_KEY = "typeDescKey"
 
-def clean_raw_data(dataframe: pd.DataFrame) -> pd.DataFrame:
+#def read_year_play_by_play()
+
+def clean_raw_data(dataframe: pd.DataFrame) -> list[pd.DataFrame]:
     """
     Function that takes play-by-play data and returns a dataframe
     containing only goal and shot events
@@ -12,68 +16,72 @@ def clean_raw_data(dataframe: pd.DataFrame) -> pd.DataFrame:
     :param dataframe: A raw pandas dataframe
     :returns: A dataframe containing only goals and shots 
     """
-    home_id = dataframe["homeTeam"]["id"]
-    away_id = dataframe["awayTeam"]["id"]
-    # key team_id, value name
-    team_names = {
-        dataframe["awayTeam"]["id"]:dataframe["awayTeam"]["name"]["default"],
-         dataframe["homeTeam"]["id"]:dataframe["homeTeam"]["name"]["default"] }
-    
-    # key player_id, value name
-    player_names = {
-        row["playerId"]: " ".join([row["firstName"]["default"],row["lastName"]["default"]]) for row in dataframe["rosterSpots"]
-    }
-    data = []
-    for row in dataframe["plays"]:
-        if row[EVENT_KEY] == "goal":
-            # we need to know if away or home goal
-            if row["situationCode"][1] == row["situationCode"][2]:
-                situation = "force egale"
+    #print(pd.json_normalize(dataframe))
+    dataframes = []
+    #print(dataframe["awayTeam"])
+    for i in range(len(dataframe)):
+        home_id = dataframe["homeTeam"][i]["id"]
+        away_id = dataframe["awayTeam"][i]["id"]
+        
+        # key team_id, value name
+        team_names = {
+            dataframe["awayTeam"][i]["id"]:dataframe["awayTeam"][i]["name"]["default"],
+            dataframe["homeTeam"][i]["id"]:dataframe["homeTeam"][i]["name"]["default"] }
+        
+        # key player_id, value name
+        player_names = {
+            row["playerId"]: " ".join([row["firstName"]["default"],row["lastName"]["default"]]) for row in dataframe["rosterSpots"][i]
+        }
+        data = []
+        for row in dataframe["plays"][i]:
+            if row[EVENT_KEY] == "goal":
+                # we need to know if away or home goal
+                if row["situationCode"][1] == row["situationCode"][2]:
+                    situation = "force egale"
 
-            elif row["situationCode"][1] > row["situationCode"][2]:
-                if row["details"]["eventOwnerTeamId"] == away_id:
-                    situation = "avantage numerique"
+                elif row["situationCode"][1] > row["situationCode"][2]:
+                    if row["details"]["eventOwnerTeamId"] == away_id:
+                        situation = "avantage numerique"
+                    else:
+                        situation = "desavantage numerique"
                 else:
-                    situation = "desavantage numerique"
-            else:
-                if row["details"]["eventOwnerTeamId"] == away_id:
-                    situation = "desavantage numerique"
-                else:
-                    situation = "avantage numerique"
+                    if row["details"]["eventOwnerTeamId"] == away_id:
+                        situation = "desavantage numerique"
+                    else:
+                        situation = "avantage numerique"
 
-            data.append(
-                row["periodDescriptor"]["number"],
-                row["timeInPeriod"],
-                team_names[row["details"]["eventOwnerTeamId"]],
-                row[EVENT_KEY],
-                row["details"]["xCoord"],
-                row["details"]["yCoord"],
-                row["details"]["shotType"],
-                row["situationCode"],
-                player_names[row["details"]["scoringPlayerId"]],
-                player_names.get(row["details"]["goalieInNetId"],None),
-                situation
+                data.append({
+                    "Type": "But",
+                    "Periode" : row["periodDescriptor"]["number"],
+                    "Temps": row["timeInPeriod"],
+                    "Equipe": team_names[row["details"]["eventOwnerTeamId"]],
+                    "xCoord": row["details"].get("xCoord"),
+                    "yCoord": row["details"].get("yCoord"),
+                    "Type de tir" : row["details"].get("shotType"),
+                    "Situation": situation,
+                    "Joueur" : player_names[row["details"]["scoringPlayerId"]],
+                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId")),
+                    }
 
-            )
-        elif row[EVENT_KEY] == "shot-on-goal":
-            
-            
-            data.append(
-                "tir",
-                row["periodDescriptor"]["number"],
-                row["timeInPeriod"],
-                team_names[row["details"]["eventOwnerTeamId"]],
-                row[EVENT_KEY],
-                row["details"]["xCoord"],
-                row["details"]["yCoord"],
-                row["details"]["shotType"],
-                row["situationCode"],
-                player_names[row["details"]["shootingPlayerId"]],
-                player_names.get(row["details"]["goalieInNetId"],None),
-
-            )
-
-    return pd.DataFrame(data=data)
+                )
+            elif row[EVENT_KEY] == "shot-on-goal":
+                
+                
+                data.append({
+                    "Type": "Tir au but",
+                    "Periode" : row["periodDescriptor"]["number"],
+                    "Temps": row["timeInPeriod"],
+                    "Equipe": team_names[row["details"]["eventOwnerTeamId"]],
+                    "xCoord": row["details"].get("xCoord"),
+                    "yCoord": row["details"].get("yCoord"),
+                    "Type de tir" :row["details"].get("shotType"),
+                    "Situation": row["situationCode"],
+                    "Joueur": player_names[row["details"]["shootingPlayerId"]],
+                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),None),
+                }
+                )
+        dataframes.append(pd.DataFrame(data=data))
+    return dataframes
 
 def fetch_season_data(season: int) -> pd.DataFrame:
         """
@@ -111,7 +119,13 @@ def fetch_season_data(season: int) -> pd.DataFrame:
 if __name__ == "__main__":
     print("lol")
     #print(clean_raw_data(fetch_season_data(2022))[0])
-    print(fetch_season_data(2022)[0])
+    #print(fetch_season_data(2022)[0])
+    play_by_play_data = PlayByPlayData(base_path=".")
+    lol = play_by_play_data.get_data(2019)
+    #print(lol)
+    dfs = clean_raw_data(lol) 
+    first = dfs[0]
+    print(first.head(10))
     
 
 # l'heure/la période de jeu
