@@ -1,24 +1,19 @@
 import pandas as pd
-import requests
 
 from  play_by_play_data import PlayByPlayData
 
-EVENTS = ["goal","shot-on-goal"]
 EVENT_KEY = "typeDescKey"
 
-#def read_year_play_by_play()
 
 def clean_raw_data(dataframe: pd.DataFrame) -> list[pd.DataFrame]:
     """
-    Function that takes play-by-play data and returns a dataframe
+    Function that takes play-by-play data and returns a list of dataframes
     containing only goal and shot events
 
-    :param dataframe: A raw pandas dataframe
+    :param dataframe: A raw pandas dataframe representing all games for a
     :returns: A dataframe containing only goals and shots 
     """
-    #print(pd.json_normalize(dataframe))
     dataframes = []
-    #print(dataframe["awayTeam"])
     for i in range(len(dataframe)):
         home_id = dataframe["homeTeam"][i]["id"]
         away_id = dataframe["awayTeam"][i]["id"]
@@ -60,7 +55,7 @@ def clean_raw_data(dataframe: pd.DataFrame) -> list[pd.DataFrame]:
                     "Type de tir" : row["details"].get("shotType"),
                     "Situation": situation,
                     "Joueur" : player_names[row["details"]["scoringPlayerId"]],
-                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId")),
+                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),"Vide"),
                     }
 
                 )
@@ -77,52 +72,17 @@ def clean_raw_data(dataframe: pd.DataFrame) -> list[pd.DataFrame]:
                     "Type de tir" :row["details"].get("shotType"),
                     "Situation": row["situationCode"],
                     "Joueur": player_names[row["details"]["shootingPlayerId"]],
-                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),None),
+                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),"Vide"),
                 }
                 )
         dataframes.append(pd.DataFrame(data=data))
     return dataframes
 
-def fetch_season_data(season: int) -> pd.DataFrame:
-        """
-        Fetch the play-by-play data of a season from the NHL's API
 
-        :param season: Season (ex: 2022 for the 2022-2023 season)
-        :return: DataFrame
-        """
-        # Only fetch regular season and playoffs
-        game_types = ['02', '03']
-        data = []
-
-        for game_type in game_types:
-            game_number = 1 
-            while True:
-                # Format the game number as a 4-digit string
-                game_number_str = f'{game_number:04d}'
-                url = f'https://api-web.nhle.com/v1/gamecenter/{season}{game_type}{game_number_str}/play-by-play'
-                response = requests.get(url)
-
-                # Break the loop if the response is a 404 error (no more games)
-                if response.status_code == 404:
-                    break
-
-                # Append the JSON response data if successful
-                elif response.status_code == 200:
-                    data.append(response.json())
-
-
-                game_number += 1
-
-        # Convert data to DataFrame and return
-        return pd.DataFrame(data)
 
 if __name__ == "__main__":
-    print("lol")
-    #print(clean_raw_data(fetch_season_data(2022))[0])
-    #print(fetch_season_data(2022)[0])
     play_by_play_data = PlayByPlayData(base_path=".")
     lol = play_by_play_data.get_data(2019)
-    #print(lol)
     dfs = clean_raw_data(lol) 
     first = dfs[0]
     print(first.head(10))
