@@ -1,103 +1,108 @@
 import pandas as pd
-
-from  play_by_play_data import PlayByPlayData
+from play_by_play_data import PlayByPlayData
 
 EVENT_KEY = "typeDescKey"
 
-
-def clean_raw_data(dataframe: pd.DataFrame) -> list[pd.DataFrame]:
+def clean_raw_data(data: list) -> list[pd.DataFrame]:
     """
-    Function that takes play-by-play data and returns a list of dataframes
-    containing only goal and shot events
+    Function that takes play-by-play data (a list of game dictionaries) and returns a list of dataframes
+    containing only goal and shot events.
 
-    :param dataframe: A raw pandas dataframe representing all games for a
-    :returns: A dataframe containing only goals and shots 
+    :param data: A list of dictionaries representing all games for a season.
+    :returns: A list of dataframes containing only goals and shots.
     """
     dataframes = []
-    for i in range(len(dataframe)):
-        home_id = dataframe["homeTeam"][i]["id"]
-        away_id = dataframe["awayTeam"][i]["id"]
+    for game in data:
+        home_id = game["homeTeam"]["id"]
+        away_id = game["awayTeam"]["id"]
         
         # key team_id, value name
         team_names = {
-            dataframe["awayTeam"][i]["id"]:dataframe["awayTeam"][i]["name"]["default"],
-            dataframe["homeTeam"][i]["id"]:dataframe["homeTeam"][i]["name"]["default"] }
+            game["awayTeam"]["id"]: game["awayTeam"]["name"]["default"],
+            game["homeTeam"]["id"]: game["homeTeam"]["name"]["default"]
+        }
         
         # key player_id, value name
         player_names = {
-            row["playerId"]: " ".join([row["firstName"]["default"],row["lastName"]["default"]]) for row in dataframe["rosterSpots"][i]
+            player["playerId"]: " ".join([player["firstName"]["default"], player["lastName"]["default"]])
+            for player in game["rosterSpots"]
         }
-        data = []
-        for row in dataframe["plays"][i]:
-            if row[EVENT_KEY] == "goal":
-                # we need to know if away or home goal
-                if row["situationCode"][1] == row["situationCode"][2]:
-                    situation = "force egale"
 
-                elif row["situationCode"][1] > row["situationCode"][2]:
-                    if row["details"]["eventOwnerTeamId"] == away_id:
+        data_rows = []
+        for play in game["plays"]:
+            if play[EVENT_KEY] == "goal":
+                # Determine the situation (even strength, power play, etc.)
+                if play["situationCode"][1] == play["situationCode"][2]:
+                    situation = "force egale"
+                elif play["situationCode"][1] > play["situationCode"][2]:
+                    if play["details"]["eventOwnerTeamId"] == away_id:
                         situation = "avantage numerique"
                     else:
                         situation = "desavantage numerique"
                 else:
-                    if row["details"]["eventOwnerTeamId"] == away_id:
+                    if play["details"]["eventOwnerTeamId"] == away_id:
                         situation = "desavantage numerique"
                     else:
                         situation = "avantage numerique"
 
-                data.append({
+                data_rows.append({
                     "Type": "But",
-                    "Periode" : row["periodDescriptor"]["number"],
-                    "Temps": row["timeInPeriod"],
-                    "Equipe": team_names[row["details"]["eventOwnerTeamId"]],
-                    "xCoord": row["details"].get("xCoord"),
-                    "yCoord": row["details"].get("yCoord"),
-                    "Type de tir" : row["details"].get("shotType"),
+                    "Periode": play["periodDescriptor"]["number"],
+                    "Temps": play["timeInPeriod"],
+                    "Equipe": team_names[play["details"]["eventOwnerTeamId"]],
+                    "xCoord": play["details"].get("xCoord"),
+                    "yCoord": play["details"].get("yCoord"),
+                    "Type de tir": play["details"].get("shotType"),
                     "Situation": situation,
-                    "Joueur" : player_names[row["details"]["scoringPlayerId"]],
-                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),"Vide"),
-                    }
-
-                )
-            elif row[EVENT_KEY] == "shot-on-goal":
-                
-                
-                data.append({
+                    "Joueur": player_names[play["details"]["scoringPlayerId"]],
+                    "Gardien de but": player_names.get(play["details"].get("goalieInNetId"), "Vide"),
+                })
+            elif play[EVENT_KEY] == "shot-on-goal":
+                data_rows.append({
                     "Type": "Tir au but",
-                    "Periode" : row["periodDescriptor"]["number"],
-                    "Temps": row["timeInPeriod"],
-                    "Equipe": team_names[row["details"]["eventOwnerTeamId"]],
-                    "xCoord": row["details"].get("xCoord"),
-                    "yCoord": row["details"].get("yCoord"),
-                    "Type de tir" :row["details"].get("shotType"),
-                    "Situation": row["situationCode"],
-                    "Joueur": player_names[row["details"]["shootingPlayerId"]],
-                    "Gardien de but" : player_names.get(row["details"].get("goalieInNetId"),"Vide"),
-                }
-                )
-        dataframes.append(pd.DataFrame(data=data))
+                    "Periode": play["periodDescriptor"]["number"],
+                    "Temps": play["timeInPeriod"],
+                    "Equipe": team_names[play["details"]["eventOwnerTeamId"]],
+                    "xCoord": play["details"].get("xCoord"),
+                    "yCoord": play["details"].get("yCoord"),
+                    "Type de tir": play["details"].get("shotType"),
+                    "Situation": play["situationCode"],
+                    "Joueur": player_names[play["details"]["shootingPlayerId"]],
+                    "Gardien de but": player_names.get(play["details"].get("goalieInNetId"), "Vide"),
+                })
+
+        dataframes.append(pd.DataFrame(data=data_rows))
+
     return dataframes
-
-
 
 if __name__ == "__main__":
     play_by_play_data = PlayByPlayData(base_path=".")
-    lol = play_by_play_data.get_data(2019)
-    dfs = clean_raw_data(lol) 
-    first = dfs[0]
-    print(first.head(10))
     
+    # Liste pour stocker les DataFrames de toutes les saisons
+    all_seasons_data = []
 
-# l'heure/la période de jeu
-# l'identifiant du jeu
-# les informations sur l'équipe (quelle équipe a tiré) 
-# s'il s'agit d'un tir ou d'un but
-# les coordonnées sur la glace
-# le nom du tireur et du gardien de but (ne vous inquiétez pas des assists pour l'instant) 
-# le type de tir
-# si c'était sur un filet vide
-# si un but était à force égale en désavantage numérique ou en avantage numérique.
+    # Boucle sur les saisons de 2016 à 2023
+    for season in range(2016, 2024):
+        print(f"Processing season {season}...")
+        season_data = play_by_play_data.get_data(season)
+        
+        if season_data is None:
+            print(f"No data found for the season {season}.")
+        else:
+            # Nettoyer les données de la saison en cours
+            season_cleaned_dfs = clean_raw_data(season_data)
+            
+            # Concaténer toutes les DataFrames d'une saison dans une seule DataFrame
+            full_season_df = pd.concat(season_cleaned_dfs, ignore_index=True)
+            
+            # Ajouter cette DataFrame à la liste de toutes les saisons
+            all_seasons_data.append(full_season_df)
+    
+    # Concaténer les données de toutes les saisons
+    combined_data = pd.concat(all_seasons_data, ignore_index=True)
 
-
-## test
-
+    # Afficher les premières lignes des données combinées
+    print(combined_data.head(10))
+    
+    # Si besoin, enregistrer les données combinées dans un fichier CSV
+    combined_data.to_csv("combined_play_by_play_2016_2023.csv", index=False)
