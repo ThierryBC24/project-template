@@ -54,16 +54,13 @@ class PlayByPlayData:
                 url = f'https://api-web.nhle.com/v1/gamecenter/{season}{game_type}{game_number_str}/play-by-play'
                 response = requests.get(url)
 
-                # Break the loop if the response is a 404 error (no more games)
-                if response.status_code == 404:
-                    break
-
                 # Append the JSON response data if successful
-                elif response.status_code == 200:
+                if response.status_code == 200:
                     data.append(response.json())
 
-
                 game_number += 1
+                if game_number > 9999:
+                    break
 
         # Convert data to DataFrame and return
         return pd.DataFrame(data)
