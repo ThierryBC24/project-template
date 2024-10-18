@@ -26,5 +26,8 @@
 # Visualisations avancées
 
 
+https://github.com/ThierryBC24/project-template/blob/data_viz/ift6758/visualizations/season_2016/2016_shot_analysis.html
+
+
 
 
