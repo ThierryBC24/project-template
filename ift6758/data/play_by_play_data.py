@@ -20,19 +20,19 @@ class PlayByPlayData:
         :param season: Season (ex: 2022 for the 2022-2023 season)
         :return: DataFrame
         """
-        file_path = os.path.join(self.base_path, f"{season}_play_by_play.csv")
+        file_path = os.path.join(self.base_path, f"{season}_play_by_play.json")
 
         # If a local file exists, load the data from the file
         if os.path.exists(file_path):
             print(f"Loading local data for the season {season}-{season+1}...")
-            return pd.read_csv(file_path)
+            return pd.read_json(file_path)
 
         # Else, download data from the API
         print(f"Downloading data for the season {season}-{season+1}...")
         data = self.fetch_season_data(season)
 
-        # Save data into a CSV file
-        data.to_csv(file_path, index=False)
+        # Save data into a JSON file
+        data.to_json(file_path, index=False)
         return data
 
     def fetch_season_data(self, season: int) -> pd.DataFrame:
@@ -73,8 +73,8 @@ class PlayByPlayData:
         """
         all_data = []
         for file in os.listdir(self.base_path):
-            if file.endswith('.csv'):
-                df = pd.read_csv(os.path.join(self.base_path, file))
+            if file.endswith('.json'):
+                df = pd.read_json(os.path.join(self.base_path, file))
                 all_data.append(df)
         return pd.concat(all_data, ignore_index=True)
 
