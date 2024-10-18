@@ -11,7 +11,7 @@
 ### Sur l’ensemble des trois saisons analysées (2018-19, 2019-20, 2020-21), il n’y a pas de variation significative de cette relation. La constance des probabilités par intervalle de distance suggère une stabilité dans les stratégies offensives et les performances défensives à travers les saisons. 
 ### Le choix de ce graphique à barres comparatives permet une visualisation précise de l’évolution inter-saison, tout en maintenant une lecture intuitive des variations entre intervalles de distance. Il met en évidence non seulement la décroissance prévisible de la probabilité de but avec l’augmentation de la distance, mais aussi la stabilité de cette dynamique au fil des saisons, soulignant l’importance de la proximité au but dans la réussite offensive.
 
-![Capture d'écran 2024-10-17 054543](https://github.com/user-attachments/assets/66cabd41-0033-42d4-9e60-664da07a064e)
+![Capture d'écran 2024-10-17 054640](https://github.com/user-attachments/assets/db870bf0-e2ca-4d9a-89a7-825644500b11)
 
 ## Q2 -A
 ### Le graphique illustre le pourcentage de buts en fonction de la distance par rapport au filet et du type de tir, en se concentrant sur la saison 2019-2020. Les résultats révèlent une forte dépendance entre l’efficacité des tirs et leur contexte spatial. 
@@ -19,7 +19,7 @@
 ### Les wrist shots et snap shots affichent une performance relativement stable entre 10 et 29 pieds, suggérant une polyvalence dans différentes zones du jeu. Cependant, les tirs tels que le wrap-around et les tentatives au-delà de 40 pieds montrent des pourcentages de réussite faibles, reflétant les contraintes imposées par l’angle ou la distance.
 ### Cette analyse met en évidence que la proximité immédiate du filet est une condition optimale pour maximiser les chances de marquer, surtout avec des types de tirs favorisant vitesse et imprévisibilité. Le graphique aide également à comprendre l’importance stratégique de la position sur la glace et du choix du type de tir en fonction du contexte du jeu.
 
-![Capture d'écran 2024-10-17 054640](https://github.com/user-attachments/assets/db870bf0-e2ca-4d9a-89a7-825644500b11)
+![Capture d'écran 2024-10-17 054543](https://github.com/user-attachments/assets/66cabd41-0033-42d4-9e60-664da07a064e)
 
 
 
