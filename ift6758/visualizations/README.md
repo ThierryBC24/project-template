@@ -23,18 +23,7 @@
 
 
 
-
-
-
-
-
-![image](https://github.com/user-attachments/assets/df7d2d57-e1ab-474d-9e9a-d5334a9e0806)
-
-![image](https://github.com/user-attachments/assets/4319a272-4923-4da0-90cd-91fec0f94aba)
-
-![image](https://github.com/user-attachments/assets/430674c3-63b5-4aed-a762-e53c3ef9eb1f)
-
-![image](https://github.com/user-attachments/assets/149f2efb-dc02-4e63-86cc-b89b5f35eb37)
+# Visualisations avancées
 
 
 
