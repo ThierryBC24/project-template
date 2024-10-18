@@ -12,26 +12,29 @@ def clean_raw_data(data: list) -> list[pd.DataFrame]:
     :returns: A list of dataframes containing only goals and shots.
     """
     dataframes = []
-    for game in data:
-        home_id = game["homeTeam"]["id"]
-        away_id = game["awayTeam"]["id"]
+    for i in range(len(data)):
+        
+        home_id = data["homeTeam"][i]["id"]
+        away_id = data["awayTeam"][i]["id"]
         
         # key team_id, value name
         team_names = {
-            game["awayTeam"]["id"]: game["awayTeam"]["name"]["default"],
-            game["homeTeam"]["id"]: game["homeTeam"]["name"]["default"]
+            data["awayTeam"][i]["id"]: data["awayTeam"][i]["name"]["default"],
+            data["homeTeam"][i]["id"]: data["homeTeam"][i]["name"]["default"]
         }
         
         # key player_id, value name
         player_names = {
             player["playerId"]: " ".join([player["firstName"]["default"], player["lastName"]["default"]])
-            for player in game["rosterSpots"]
+            for player in data["rosterSpots"][i]
         }
 
         data_rows = []
-        for play in game["plays"]:
+        for play in data["plays"][i]:
+            # Determine the situation (even strength, power play, etc.)
+            
+
             if play[EVENT_KEY] == "goal":
-                # Determine the situation (even strength, power play, etc.)
                 if play["situationCode"][1] == play["situationCode"][2]:
                     situation = "force egale"
                 elif play["situationCode"][1] > play["situationCode"][2]:
