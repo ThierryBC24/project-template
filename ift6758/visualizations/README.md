@@ -25,8 +25,27 @@
 
 # Visualisations avancées
 
+### Question 1
 
 https://github.com/ThierryBC24/project-template/blob/data_viz/ift6758/visualizations/season_2016/2016_shot_analysis.html
+
+https://github.com/ThierryBC24/project-template/blob/data_viz/ift6758/visualizations/season_2017/2017_shot_analysis.html
+
+https://github.com/ThierryBC24/project-template/blob/data_viz/ift6758/visualizations/season_2018/2018_shot_analysis.html
+
+https://github.com/ThierryBC24/project-template/blob/data_viz/ift6758/visualizations/season_2019/2019_shot_analysis.html
+
+### Question 2  
+Les graphiques révèlent, pour chaque saison de 2016 à 2020, les zones offensives où les équipes ont généré un volume de tirs supérieur (zones rouges) ou inférieur (zones bleues) à la moyenne de la ligue. L’intensité des couleurs traduit l'ampleur de l'écart : plus la teinte rouge ou bleue est marquée, plus la différence avec la moyenne est significative. L'analyse se concentre uniquement sur les tirs cadrés — ceux qui ont abouti à un arrêt du gardien ou un but —, excluant ainsi les tirs hors-cible et les tirs bloqués par des joueurs adverses. Cette approche permet de cibler précisément les situations où le tir présente une réelle probabilité de succès.
+
+### Question 3  
+L’Avalanche du Colorado illustre bien l’importance des zones offensives sur la performance globale d’une équipe. Pour la saison 2016-17, l’équipe a généré moins de tirs que la moyenne dans l’enclave, une zone reconnue pour son efficacité, située directement devant le filet entre les deux cercles de mise au jeu. En revanche, ils ont légèrement surpassé la moyenne au niveau de la position du défenseur gauche. Ce déficit de tirs dans l’enclave reflète probablement leur faible performance cette saison-là : avec seulement 48 points, l’Avalanche a terminé dernière au classement de la ligue.  
+En revanche, la carte de la saison 2020-21 montre une amélioration notable. L’équipe a généré un volume de tirs supérieur à la moyenne dans plusieurs zones, y compris l’enclave et la position du défenseur gauche. Les zones où ils ont tiré moins que la moyenne sont peu significatives, comme celle du défenseur droit. Cette évolution positive est cohérente avec leur classement final, puisqu’ils ont terminé la saison en tête avec 82 points, à égalité avec une autre équipe. L’augmentation des tirs dans les zones efficaces comme l’enclave témoigne d’une optimisation de leur stratégie offensive.
+
+### Question 4  
+L’analyse comparative des Sabres de Buffalo et du Lightning de Tampa Bay souligne le rôle de la localisation des tirs dans la réussite d’une équipe. Les Sabres, qui ont connu des difficultés, tirent moins que la moyenne à proximité immédiate du filet, tout en augmentant leur volume de tirs depuis des positions éloignées. Ces choix stratégiques sont probablement à l’origine de leurs échecs, car la probabilité de marquer décroît avec la distance au filet. 
+Le Lightning, en revanche, montre une stratégie différente. Bien qu’ils réalisent peu de tirs dans la zone la plus proche du filet, ils concentrent leurs efforts dans l’enclave, une zone clé pour marquer. Ce positionnement est probablement lié à leur succès, puisque l’enclave maximise les opportunités de marquer. 
+Cependant, ces analyses restent hypothétiques, car elles ne prennent pas en compte la qualité des tirs ou le contexte du jeu (comme les avantages numériques). Une équipe pourrait avoir un volume élevé de tirs sur ces cartes mais afficher un faible taux de réussite si elle privilégie la quantité à la qualité. Les cartes de tirs offrent ainsi un aperçu précieux mais ne suffisent pas à elles seules à expliquer entièrement les performances d’une équipe.
 
 
 
