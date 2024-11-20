@@ -43,5 +43,7 @@ accuracy = accuracy_score(y_validate, y_pred)
 # Log accuracy to WandB
 wandb.log({"accuracy": accuracy})
 
+wandb.log_model(path=Path(__file__),name="Logistic_regression_dist_angle")
+
 # Finish WandB session
 wandb.finish()
