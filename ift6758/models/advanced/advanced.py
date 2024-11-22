@@ -3,10 +3,18 @@ import numpy as np
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc
-
 from sklearn.calibration import calibration_curve
 from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
+import wandb
+
+# Initialiser un projet WandB
+wandb.init(project="XGBoost distance angle", config={
+        "architecture": "Tree",
+        "dataset": "play-by-play-regular-season-2016-2019",
+        "test_size": 0.2,
+        "random_state": 42,
+    },)
 
 # Charger les données
 play_by_play_path = Path(__file__).parent.parent.parent.parent / "data" / "dataframe_2016_to_2019.csv"
@@ -24,6 +32,12 @@ def train_model(X, y):
     
     model.fit(X_train, y_train)
     prob = model.predict_proba(X_validate)[:, 1]
+    
+    # Loguer les paramètres du modèle
+    wandb.log({"learning_rate": model.get_params()['learning_rate'],
+               "n_estimators": model.get_params()['n_estimators'],
+               "max_depth": model.get_params()['max_depth']})
+    wandb.log_model(path=Path(__file__),name="XGBoost_dist_angle")
     return prob, y_validate
 
 # Entraîner le modèle pour "Distance + Angle"
@@ -48,6 +62,9 @@ plt.ylabel("Taux de vrais positifs (TPR)")
 plt.title("Courbe ROC")
 plt.legend()
 plt.grid()
+
+# Loguer le graphique ROC sur WandB
+wandb.log({"roc_curve": wandb.Image(plt)})
 plt.show()
 
 # **2. Taux de buts par centile**
@@ -76,6 +93,9 @@ plt.ylim(0, 100)
 plt.grid()
 plt.legend()
 plt.gca().invert_xaxis()
+
+# Loguer le graphique du taux de buts par centile
+wandb.log({"goal_rate_by_percentile": wandb.Image(plt)})
 plt.show()
 
 # **3. Proportion cumulée des buts**
@@ -104,6 +124,9 @@ plt.ylim(0, 100)
 plt.grid()
 plt.legend()
 plt.gca().invert_xaxis()
+
+# Loguer la proportion cumulée des buts
+wandb.log({"cumulative_goal_proportion": wandb.Image(plt)})
 plt.show()
 
 # **4. Diagramme de fiabilité**
@@ -123,4 +146,10 @@ plt.xlabel("Probabilités prédites")
 plt.ylabel("Fréquence observée (empirique)")
 plt.legend()
 plt.grid()
+
+# Loguer le diagramme de fiabilité
+wandb.log({"calibration_plot": wandb.Image(plt)})
 plt.show()
+
+# Fin de l'enregistrement dans WandB
+wandb.finish()
