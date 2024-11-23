@@ -23,10 +23,14 @@ def v_angle(v1: np.array, v2: np.array) -> float:
 
 
 def zoneshoot(clean_df: pd.DataFrame) -> pd.DataFrame:
+
+    
     coords_list = [] 
     coords_last_event_list = []
 
-    first_home_team_offensive_event = clean_df[(clean_df['zoneShoot'] == 'O') & (clean_df['teamSide'] == 'home')].iloc[0]
+    
+    first_home_team_offensive_event = clean_df[(clean_df['zoneShoot'] == 'O') & (clean_df['teamSide'] == 'home')].iloc[
+        0]
     home_team_initial_side = 'right' if first_home_team_offensive_event['xCoord'] < 0 else 'left'
 
     for _, row in clean_df.iterrows():
@@ -39,30 +43,36 @@ def zoneshoot(clean_df: pd.DataFrame) -> pd.DataFrame:
 
     dist_euclidian = lambda x1, x2: np.round(np.linalg.norm(np.array(x1) - np.array(x2)), decimals=1)
 
-    clean_df['distance_to_goal'] = clean_df.apply(
-        lambda x: dist_euclidian(x['adjustedCoord'], np.array([0, 89])), axis=1)
+    clean_df['shotDistance'] = clean_df.apply(lambda x: dist_euclidian(x['adjustedCoord'], np.array([0, 89])), axis=1)
 
-    clean_df['distance_since_last_event'] = clean_df.apply(
-        lambda x: dist_euclidian(x1=(x['xCoord'], x['yCoord']),
-                                 x2=(x['previousXCoord'], x['previousYCoord']))
+    clean_df['distanceFromLastEvent'] = clean_df.apply(
+        lambda x: dist_euclidian(x1=(x['xCoord'], x['yCoord'])
+        , x2=(x['previousXCoord'], x['previousYCoord']))
         if not pd.isnull(x['previousXCoord']) else None, axis=1)
+    clean_df['rebound'] = clean_df.apply(lambda x:
+    True if x['previousEventType'] == 'shot-on-goal' else False, axis=1
+    )
 
-    clean_df['is_rebound'] = clean_df.apply(
-        lambda x: True if x['previousEventType'] == 'shot-on-goal' else False, axis=1)
+    # Add speed
+    clean_df['speedFromLastEvent'] = clean_df.apply(lambda x:
+    x['distanceFromLastEvent'] / x['timeSinceLastEvent']
+    if x['timeSinceLastEvent'] != 0 else 0
+    , axis=1)
 
-    clean_df['speed_since_last_event'] = clean_df.apply(
-        lambda x: x['distance_since_last_event'] / x['timeSinceLastEvent']
-        if x['timeSinceLastEvent'] != 0 else 0, axis=1)
-
-    clean_df['angle_to_goal'] = clean_df.apply(
+    clean_df['shotAngle'] = clean_df.apply(
         lambda x: v_angle(x['adjustedCoord'] - np.array([0, 89]), np.array([0, -89])), axis=1)
 
-    clean_df['rebound_angle_to_goal'] = clean_df.apply(
-        lambda x: v_angle(x['adjustedLastEventCoord'] - np.array([0, 89]), np.array([0, -89]))
-        if x['is_rebound'] else 0, axis=1)
+    clean_df['reboundAngleShot'] = clean_df.apply(
+        lambda x: v_angle(x['adjustedLastEventCoord'] - np.array([0, 89]), np.array([0, -89]) + x['shotAngle']
+        if x['rebound'] else 0), axis=1)
 
-    clean_df.drop(columns=['adjustedCoord', 'adjustedLastEventCoord'], inplace=True)
+    clean_df.drop(columns=['adjustedCoord'], inplace=True)
+    clean_df.drop(columns=['adjustedLastEventCoord'], inplace=True)
 
-    clean_df['offensive_time_elapsed'] = clean_df.groupby('eventOwnerTeam')['gameSeconds'].diff().fillna(0)
+    clean_df['offensivePressureTime'] = clean_df.groupby('eventOwnerTeam')['gameSeconds'].diff()
+
+    # Convert the time to minutes and seconds
+    clean_df['offensivePressureTime'] = clean_df.apply(lambda x: 0
+    if pd.isnull(x['offensivePressureTime']) else x['offensivePressureTime'], axis=1)
 
     return clean_df

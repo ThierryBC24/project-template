@@ -49,19 +49,3 @@ def ing_event_bef(df: pd.DataFrame):
 
     return df
 
-def ing_event_bef(df: pd.DataFrame):
-    df_copy = df.copy().shift(1)
-    df['last_event_type'] = df_copy['typeDescKey']
-
-    df['time_since_last_event'] = df['gameSeconds'].diff()
-    df['time_since_last_event'] = df.apply(lambda x: 0
-                                           if pd.isnull(x['time_since_last_event']) else abs(x['time_since_last_event']),
-                                           axis=1)
-
-    details = df_copy['details'].apply(pd.Series)
-    df["last_x_coord"] = details['xCoord']
-    df["last_y_coord"] = details['yCoord']
-
-    return df
-
-
