@@ -3,9 +3,9 @@ import numpy as np
 from NHLData import NHLData
 from data_cleaning import clean_data, convert_dictionaries_to_dataframes
 
-filename = './data/dataframe_2016_to_2019.csv'
-start_year = 2016
-end_year = 2019
+filename = './data/dataframe_2020_to_2021.csv'
+start_year = 2020
+end_year = 2021
 
 
 def get_data_from(first_year: int, last_year: int) -> NHLData:
