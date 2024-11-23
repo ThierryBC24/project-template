@@ -8,12 +8,14 @@ from ift6758.features.play_by_play import NHLData
 
 
 def df_convert(game_nhl: dict) -> pd.DataFrame:
+    
     df_pbp = pd.DataFrame(game_nhl['plays'])
 
     df_players = get_player(game_nhl)
     df_teams = get_teams(game_nhl)
 
-    clean_df = pd.DataFrame(df_pbp[['periodDescriptor', 'timeInPeriod', 'situationCode', 'typeDescKey', 'details']])
+    clean_df = pd.DataFrame(df_pbp[['periodDescriptor', 'timeInPeriod', 'situationCode',
+                                    'typeDescKey', 'details']])
 
     df_period = ing_period(clean_df)
     clean_df.drop('periodDescriptor', axis=1, inplace=True)
@@ -53,7 +55,6 @@ def df_convert(game_nhl: dict) -> pd.DataFrame:
 
     clean_df.drop('situationCode', axis=1, inplace=True)
     return clean_df
-
 
 
 def data_clean(raw_data: NHLData) -> tuple:
